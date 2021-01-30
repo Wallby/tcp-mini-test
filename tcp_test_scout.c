@@ -33,8 +33,8 @@ int main()
 
   struct unformattedbuffer_t b = unformattedbuffer_default;
   char* c = "hello";
-  b.size = sizeof c;
-  TM_SEND_BLOCK(&b, c);
+  b.size = strlen(c);
+  TM_SEND(&b, c, b.size);
 
   tm_disconnect();
 
