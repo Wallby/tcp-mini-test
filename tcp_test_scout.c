@@ -7,6 +7,18 @@
 
 #include <errno.h>
 
+void my_on_receive(struct tm_message_t* message, int a)
+{
+}
+
+int bHasHungUp = 0;
+void my_on_hung_up()
+{
+  bHasHungUp = 1;
+
+  printf("match has hung up\n");
+}
+
 int main()
 {
   struct tm_match_blob_t a;
@@ -19,6 +31,9 @@ int main()
   a.port = 44444;
 
   printf("started\n");
+
+  tm_set_on_receive(my_on_receive);
+  TM_SET_ON_HUNG_UP(my_on_hung_up);
 
   if(tm_connect(a) != 1)
   {
@@ -36,7 +51,15 @@ int main()
   b.size = strlen(c);
   TM_SEND(&b, c, b.size);
 
+  while(!bHasHungUp)
+  {
+	  tm_poll(1);
+  }
+
   tm_disconnect();
 
   printf("disconnected\n");
+
+  TM_UNSET_ON_HUNG_UP();
+  tm_unset_on_receive();
 }
