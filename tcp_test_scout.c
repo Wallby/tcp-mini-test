@@ -4,6 +4,7 @@
 #include "buffer_message.h"
 
 #include <string.h>
+#include <pthread.h>
 
 #include <errno.h>
 
@@ -17,6 +18,31 @@ void my_on_hung_up()
   bHasHungUp = 1;
 
   printf("match has hung up\n");
+}
+
+enum
+{
+	EAttemptConnectResult_Connected = 1,
+	EAttemptConnectResult_FailedToConnect
+};
+int attemptConnectResult = 0; //< 0 means pending
+
+void* attempt_connect(void* a)
+{
+	struct tm_match_blob_t* b = (struct tm_match_blob_t*) a;
+
+	if(tm_connect(*b) != 1)
+	{
+		if(errno == ECONNREFUSED)
+		{
+			// .. (we were refused, there might not be a server with the hostname/ip and port)
+		}
+		attemptConnectResult = EAttemptConnectResult_FailedToConnect;
+		return NULL;
+	}
+
+	attemptConnectResult = EAttemptConnectResult_Connected;
+	return NULL;
 }
 
 int main()
@@ -35,13 +61,25 @@ int main()
   tm_set_on_receive(my_on_receive);
   TM_SET_ON_HUNG_UP(my_on_hung_up);
 
-  if(tm_connect(a) != 1)
+  pthread_t d;
+  pthread_create(&d, NULL, &attempt_connect, &a);
+
+  while(1)
   {
-	if(errno == ECONNREFUSED)
-	{
-		// .. (we were refused, there might not be a server with the hostname/ip and port)
-	}
-    return -1;
+	  switch(attemptConnectResult)
+	  {
+	  case EAttemptConnectResult_FailedToConnect:
+		  printf("failed to connect\n");
+		  return 1;
+	  case 0: //< pending
+		  sleep(1);
+		  continue;
+	  }
+
+	  if(attemptConnectResult == EAttemptConnectResult_Connected)
+	  {
+		  break;
+	  }
   }
 
   printf("connected\n");
