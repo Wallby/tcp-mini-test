@@ -3,8 +3,12 @@
 
 #include "buffer_message.h"
 
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+
 #include <string.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include <errno.h>
 
