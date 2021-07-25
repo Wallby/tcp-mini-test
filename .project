@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>tcp-test-scout</name>
+	<name>tcp-mini-test</name>
 	<comment></comment>
 	<projects>
 		<project>tcp-mini</project>
