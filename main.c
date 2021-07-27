@@ -116,7 +116,7 @@ void test_3_on_scout_connected(int port, char* ipAddressOrHostname)
 // NOTE: script for test 3..
 //       tm_set_on_match_hung_up + tm_set_on_receive_from_match
 //       tm_become_a_match + while(1) { <tm_connect_to_match> }
-//       tm_send_to_scout(/*...*/);
+//       TM_SEND_TO_SCOUT(/*...*/);
 //       tm_stop_being_a_match
 //       tm_unset_on_match_hung_up + tm_unset_on_receive_from_match
 
@@ -155,7 +155,7 @@ void test_3_match(void* a)
 	struct tm_message_t c;
 
 	pthread_mutex_lock(&test_3_tcp_mini_mutex);
-	tm_send_to_scout(testPort, test_3_scout_ip_address_or_hostname, &c, sizeof(struct tm_message_t), NULL, 0);
+	TM_SEND_TO_SCOUT(testPort, test_3_scout_ip_address_or_hostname, &c, NULL, 0);
 	//pthread_mutex_unlock(&test_3_tcp_mini_mutex);
 	// will message still be received if disconnect is "right after"?
 	//pthread_mutex_lock(&test_3_tcp_mini_mutex);
@@ -314,7 +314,7 @@ void test_2_on_receive_from_scout(int port, char* ipAddressOrHostname, struct tm
 // NOTE: "script" for test 2..
 //       tm_set_on_scout_connected + tm_set_on_scout_hung_up + tm_set_on_receive_from_scout
 //       tm_become_a_match + while(1) { <tm_connect_to_match> }
-//       tm_send_to_match(/*...*/);
+//       TM_SEND_TO_MATCH(/*...*/);
 //       tm_disconnect_from_match
 //       tm_unset_on_scout_connected + tm_unset_on_scout_hung_up + tm_unset_on_receive_from_scout
 #if defined(__linux__)
@@ -342,7 +342,7 @@ void test_2_scout(void* a)
 	struct tm_message_t c;
 
 	pthread_mutex_lock(&test_2_tcp_mini_mutex);
-	tm_send_to_match(test_2_a, &c, sizeof(struct tm_message_t), NULL, 0); //< i.e. "dummy message" (to trigger callback only)
+	TM_SEND_TO_MATCH(test_2_a, &c, NULL, 0); //< i.e. "dummy message" (to trigger callback only)
 	//pthread_mutex_unlock(&test_2_tcp_mini_mutex);
 	// will message still be received if disconnect is "right after"?
 	//pthread_mutex_lock(&test_2_tcp_mini_mutex);
@@ -641,7 +641,7 @@ void test_1_match(void* a)
 }
 
 // test_1 -> "timeout test" (a.k.a. "bad message" test #1)
-// NOTE: i.e. send message of < sizeof(int) bytes (without using tm_send)
+// NOTE: i.e. send message of < sizeof(int) bytes (without using tm_send_to_<scout|scouts|match>)
 //       should result in other side hanging up
 // NOTE: since timeout code is exactly the same for both scout and match..
 //       .. testing only "one directional" suffices..?
