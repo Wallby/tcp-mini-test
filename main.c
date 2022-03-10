@@ -47,6 +47,9 @@ void pthread_join(pthread_t a, void* b)
 
 #if defined(_WIN32)
 #include <winsock2.h>
+#else
+#define SOCKET int
+#define INVALID_SOCKET -1
 #endif
 
 
@@ -148,7 +151,7 @@ void test_3_match(void* a)
 	while(test_3_scout_connected == 0)
 	{
 		// NOTE: e should be displayed once (for connected)
-		fputs("e\n", stdout);
+		//fputs("e\n", stdout);
 		tm_poll_from_scouts(testPort, -1);
 	}
 
@@ -200,7 +203,7 @@ void test_3_scout(void* a)
 	while(test_3_match_hung_up == 0)
 	{
 		// NOTE: d should be displayed once (for message received + to detect hang up)
-		fputs("d\n", stdout);
+		//fputs("d\n", stdout);
 		pthread_mutex_lock(&test_3_tcp_mini_mutex);
 		tm_poll_from_match(test_3_a, -1);
 		pthread_mutex_unlock(&test_3_tcp_mini_mutex);
@@ -387,7 +390,7 @@ void test_2_match(void* a)
 	while(!(test_2_scout_connected == 1 && test_2_scout_hung_up == 1))
 	{
 		// NOTE: c should be displayed twice (i.e. once for connected, second time for message received)..?
-		fputs("c\n", stdout);
+		//fputs("c\n", stdout);
 
 		pthread_mutex_lock(&test_2_tcp_mini_mutex);
 		tm_poll_from_scouts(testPort, -1);
@@ -494,12 +497,14 @@ struct match_t
 
 struct scout_t* get_scouts()
 {
-	return (struct scout_t*)tm_get_scouts();
+	//return (struct scout_t*)tm_get_scouts();
+	return NULL;
 }
 
 struct match_t* get_matches()
 {
-	return (struct match_t*)tm_get_matches();
+	//return (struct match_t*)tm_get_matches();
+	return NULL;
 }
 
 pthread_mutex_t test_1_tcp_mini_mutex; //< i.e. tcp mini is not multi-thread safe (so only one thread may use at a time)
@@ -553,7 +558,7 @@ void test_1_scout(void* a)
 	while(clock() - d < CLOCKS_PER_SEC * 3.0f && test_1_match_hung_up == 0)
 	{
 		// NOTE: a should be displayed once (i.e. to detect hang up)
-		fputs("a\n", stdout);
+		//fputs("a\n", stdout);
 
 		pthread_mutex_lock(&test_1_tcp_mini_mutex);
 		tm_poll_from_match(c, -1); //< i.e. to detect on_match_hung_up
@@ -618,7 +623,7 @@ void test_1_match(void* a)
 	while(test_1_scout_hung_up == 0)
 	{
 		// NOTE: b should be displayed once (i.e. to receive "bad message" and immediately hang up as a result)
-		fputs("b\n", stdout);
+		//fputs("b\n", stdout);
 
 		// NOTE: in tm_poll_<from_scouts|from_matches> e.g. process_messages might cause same registers to be used on all threads..?
 		pthread_mutex_lock(&test_1_tcp_mini_mutex);
@@ -768,7 +773,7 @@ int main()
 		} \
 	}
 
-		TEST(1);
+		//TEST(1);
 		TEST(2);
 		TEST(3);
 
