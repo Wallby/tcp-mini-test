@@ -23,3 +23,5 @@ andrun: tcp-mini-test.exe
 clean:
 	if exist main.o del main.o
 	if exist tcp-mini-test.exe del tcp-mini-test.exe
+# if linux leftover.. also remove linux leftover..
+	if exist tcp-mini-test del tcp-mini-test
