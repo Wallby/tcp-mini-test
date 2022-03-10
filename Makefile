@@ -23,4 +23,6 @@ andrun: tcp-mini-test
 clean:
 	rm -f main.o
 	rm -f tcp-mini-test
+# if windows leftover.. also remove windows leftover..
+	rm -f tcp-mini-test.exe
 
